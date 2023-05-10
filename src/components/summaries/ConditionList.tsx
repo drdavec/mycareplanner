@@ -3,6 +3,8 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FHIRData, hasScope, displayDate } from '../../data-services/models/fhirResources'
+// import { Coding } from '../../data-services/fhir-types/fhir-r4'
+import { AnyObject } from 'immer/dist/internal'
 import { PatientSummary, ScreeningSummary, ConditionSummary } from '../../data-services/models/cqlSummary'
 import { getConditionSummary } from '../../data-services/mccCqlService'
 import { Summary, SummaryRowItem, SummaryRowItems } from './Summary'
@@ -138,11 +140,32 @@ const buildRows = (cond: ConditionSummary): SummaryRowItems => {
 
   const categoryName: SummaryRowItem = {
     isHeader: false,
-    twoColumns: true,
+    twoColumns: false,
     data1: <b>{cond.Category ?? ''}</b>,
-    data2: cond.CommonName === null ? '' : cond.ConceptName,
+    data2: undefined,
+    // data2: cond.CommonName === null ? '' : cond.ConceptName,
   }
   rows.push(categoryName)
+
+  const codeText: SummaryRowItem = {
+    isHeader: false,
+    twoColumns: false,
+    data1: (cond.CodeableConcept as AnyObject)?.text?.value ?? '',
+    data2: undefined,
+  }
+  rows.push(codeText)
+
+  const codes: SummaryRowItems | undefined = cond.CodeableConcept?.coding?.map((coding: AnyObject) => (
+    {
+      isHeader: false,
+      twoColumns: false,
+      data1: (coding.display?.value ?? '') + '  (' + (coding.system?.value ?? '') + ' ' + (coding.code?.value ?? '') + ')',
+      data2: undefined,
+    }
+  ))
+  if (codes?.length) {
+    rows = rows.concat(codes)
+  }
 
   return rows
 }

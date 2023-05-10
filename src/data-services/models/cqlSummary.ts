@@ -1,4 +1,5 @@
 import { FHIRData } from './fhirResources';
+import { CodeableConcept } from '../fhir-types/fhir-r4'
 
 export interface CQLLibrary {
   // cql.Library reference
@@ -54,6 +55,7 @@ export interface ConditionSummary {
   Category?: string,
   CommonName?: string,
   ConceptName: string,
+  CodeableConcept?: CodeableConcept,
   RecordedDate?: string,
   AssertedDate?: string,
   OnsetDate?: string,
